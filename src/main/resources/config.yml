@@ -1,0 +1,10 @@
+toggled-players: []
+actionbar-message: "<gradient:#4b6cb7:#8a2be2>Staff Chat Mode: <color:#90ee90>ON"
+actionbar-loop-time: 100
+event-location:
+  world: world
+  x: 0
+  y: 64
+  z: 0
+  yaw: 0
+  pitch: 0
