@@ -1,0 +1,8 @@
+name: BoxEliteStaff
+version: '${project.version}'
+main: tiie.boxelitestaff.BoxEliteStaff
+api-version: '1.21'
+commands:
+  staffchat:
+    aliases: [sc]
+  event:

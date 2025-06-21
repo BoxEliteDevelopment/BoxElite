@@ -1,0 +1,9 @@
+tiie\boxelitestaff\JoinEvent\EventCommand.class
+tiie\boxelitestaff\JoinEvent\EventManager.class
+tiie\boxelitestaff\StaffClasses\StaffChatListener.class
+tiie\boxelitestaff\StaffClasses\StaffChatManager.class
+tiie\boxelitestaff\JoinEvent\SavedInventory.class
+tiie\boxelitestaff\StaffClasses\StaffChatCommand.class
+tiie\boxelitestaff\BoxEliteStaff.class
+tiie\boxelitestaff\JoinEvent\EventListener.class
+tiie\boxelitestaff\StaffClasses\MessagerManager.class
