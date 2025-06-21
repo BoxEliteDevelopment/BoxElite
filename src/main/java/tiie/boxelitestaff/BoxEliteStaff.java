@@ -1,6 +1,9 @@
 package tiie.boxelitestaff;
 
+import net.md_5.bungee.api.ChatMessageType;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import tiie.boxelitestaff.JoinEvent.EventCommand;
 import tiie.boxelitestaff.JoinEvent.EventListener;
@@ -12,6 +15,8 @@ import tiie.boxelitestaff.StaffClasses.StaffChatManager;
 
 public final class BoxEliteStaff extends JavaPlugin {
 
+    private String updateVerison = "v1.1";
+
     private StaffChatManager staffChatManager;
     private MessagerManager messageManager;
     private StaffChatCommand staffChatCommand;
@@ -20,6 +25,10 @@ public final class BoxEliteStaff extends JavaPlugin {
     private EventManager eventManager;
     @Override
     public void onEnable() {
+
+        sendPluginUpdateMessage();
+
+
 
         //TODO make main more clean
 
@@ -67,5 +76,16 @@ public final class BoxEliteStaff extends JavaPlugin {
 
     public MessagerManager getMessageManager() {
         return messageManager;
+    }
+
+    public void sendPluginUpdateMessage(){
+        Bukkit.getScheduler().runTaskLater(this, () -> {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (player.isOp()) {
+                    player.sendMessage(ChatColor.GOLD + "BoxElite " + ChatColor.GRAY +
+                            "plugin running version.. " + ChatColor.GREEN + updateVerison);
+                }
+            }
+        }, 100L); // 100 ticks = 5 seconds
     }
 }

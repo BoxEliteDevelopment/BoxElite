@@ -26,22 +26,22 @@ public class MessagerManager {
 
     public Component formatStaffChatMessage(String senderName, String message) {
 
-        String raw = "<gradient:#4b6cb7:#8a2be2>[BoxElite SC] <dark_purple>" + senderName + ": <white>" + message;
+        String raw = "<b><gradient:#7500FF:#FFFFFF>Staff Chat |</gradient></b> <white>" + senderName + ": <white>" + message;
         return miniMessage.deserialize(raw);
     }
 
 
     public Component formatToggleMessage(boolean enabled) {
         if (enabled) {
-            return miniMessage.deserialize("<gradient:#4b6cb7:#8a2be2><bold>StaffChat:</bold></gradient> <gray>You have <green>enabled</green> StaffChat mode.");
+            return miniMessage.deserialize("<b><gradient:#7500FF:#FFFFFF>Staff Chat | </gradient></b> <gray>You have <green>enabled</green> StaffChat mode.");
         } else {
-            return miniMessage.deserialize("<gradient:#4b6cb7:#8a2be2><bold>StaffChat:</bold></gradient> <gray>You have <red>disabled</red> StaffChat mode.");
+            return miniMessage.deserialize("<b><gradient:#7500FF:#FFFFFF>Staff Chat | </gradient></b> <gray>You have <red>disabled</red> StaffChat mode.");
         }
     }
 
     public Component getNoPermissionMessage() {
         // Red error message
-        String rawMsg = "<gradient:#ff0000:#8b0000><bold>BoxElite</bold></gradient> <gray>|</gray> <red>You don’t have permission.";
+        String rawMsg = "<b><gradient:#7500FF:#FFFFFF>Staff Chat | </gradient></b>  <red>You don’t have permission.";
         return miniMessage.deserialize(rawMsg);
     }
 }

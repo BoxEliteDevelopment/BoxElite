@@ -107,25 +107,25 @@ public class EventCommand implements CommandExecutor, TabCompleter {
 
     public Component getJoinMessage() {
         // Gold-ish gradient for joined message
-        String rawMsg = "<gradient:#ffd700:#ffa500><bold>BoxElite</bold></gradient> <gray>|</gray> <gold>You have joined the event!";
+        String rawMsg = "<b><gradient:#7500FF:#FFFFFF>BoxElite | </gradient></b>  <gold>You have joined the event!";
         return miniMessage.deserialize(rawMsg);
     }
 
     public Component getAlreadyInEventMessage() {
         // Red gradient for error message
-        String rawMsg = "<gradient:#ff0000:#8b0000><bold>BoxElite</bold></gradient> <gray>|</gray> <red>You are already in the event.";
+        String rawMsg = "<b><gradient:#7500FF:#FFFFFF>BoxElite | </gradient></b>  <red>You are already in the event.";
         return miniMessage.deserialize(rawMsg);
     }
 
     public Component getRestoreAllMessage() {
         // Green gradient success message
-        String rawMsg = "<gradient:#00ff00:#008000><bold>BoxElite</bold></gradient> <gray>|</gray> <green>Restored all saved inventories.";
+        String rawMsg = "<b><gradient:#7500FF:#FFFFFF>BoxElite | </gradient></b>  <green>Restored all saved inventories.";
         return miniMessage.deserialize(rawMsg);
     }
 
     public Component getNoPermissionMessage() {
         // Red error message
-        String rawMsg = "<gradient:#ff0000:#8b0000><bold>BoxElite</bold></gradient> <gray>|</gray> <red>You don’t have permission.";
+        String rawMsg = "<b><gradient:#7500FF:#FFFFFF>BoxElite | </gradient></b> <red>You don’t have permission.";
         return miniMessage.deserialize(rawMsg);
     }
 
