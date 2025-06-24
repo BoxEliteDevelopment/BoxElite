@@ -8,12 +8,12 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import tiie.boxelitestaff.BoxEliteStaff;
-import tiie.boxelitestaff.spleef.Arena.SpleefArena;
-import tiie.boxelitestaff.spleef.Player.PlayerStats;
-import tiie.boxelitestaff.spleef.Player.StatsManager;
-import tiie.boxelitestaff.spleef.Session.ArenaSessionManager;
-import tiie.boxelitestaff.spleef.Session.ArenaSetupSession;
-import tiie.boxelitestaff.spleef.Session.GameSession;
+import tiie.boxelitestaff.spleef.arena.SpleefArena;
+import tiie.boxelitestaff.spleef.player.PlayerStats;
+import tiie.boxelitestaff.spleef.player.StatsManager;
+import tiie.boxelitestaff.spleef.session.ArenaSessionManager;
+import tiie.boxelitestaff.spleef.session.ArenaSetupSession;
+import tiie.boxelitestaff.spleef.session.GameSession;
 import tiie.boxelitestaff.utils.PlayerCommand;
 
 import java.io.File;

@@ -1,4 +1,4 @@
-package tiie.boxelitestaff.spleef.Player;
+package tiie.boxelitestaff.spleef.player;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

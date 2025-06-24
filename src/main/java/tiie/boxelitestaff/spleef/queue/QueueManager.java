@@ -3,10 +3,10 @@ package tiie.boxelitestaff.spleef.queue;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import tiie.boxelitestaff.BoxEliteStaff;
-import tiie.boxelitestaff.spleef.Arena.ArenaManager;
-import tiie.boxelitestaff.spleef.Arena.SpleefArena;
-import tiie.boxelitestaff.spleef.Player.QueuedPlayer;
-import tiie.boxelitestaff.spleef.Session.GameSession;
+import tiie.boxelitestaff.spleef.arena.ArenaManager;
+import tiie.boxelitestaff.spleef.arena.SpleefArena;
+import tiie.boxelitestaff.spleef.player.QueuedPlayer;
+import tiie.boxelitestaff.spleef.session.GameSession;
 
 import java.util.*;
 

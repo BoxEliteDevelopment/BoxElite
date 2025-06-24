@@ -1,12 +1,11 @@
 package tiie.boxelitestaff.spleef.scoreboard;
 
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
 import tiie.boxelitestaff.BoxEliteStaff;
-import tiie.boxelitestaff.spleef.Player.PlayerStats;
-import tiie.boxelitestaff.spleef.Player.StatsManager;
+import tiie.boxelitestaff.spleef.player.PlayerStats;
+import tiie.boxelitestaff.spleef.player.StatsManager;
 
 import java.util.*;
 

@@ -1,4 +1,4 @@
-package tiie.boxelitestaff.spleef.Arena;
+package tiie.boxelitestaff.spleef.arena;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -6,8 +6,8 @@ import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import tiie.boxelitestaff.spleef.Player.QueuedPlayer;
-import tiie.boxelitestaff.spleef.Session.GameSession;
+import tiie.boxelitestaff.spleef.player.QueuedPlayer;
+import tiie.boxelitestaff.spleef.session.GameSession;
 
 import java.util.*;
 import java.util.stream.Collectors;

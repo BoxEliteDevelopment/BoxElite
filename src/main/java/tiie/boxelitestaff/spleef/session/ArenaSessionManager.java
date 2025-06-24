@@ -1,4 +1,4 @@
-package tiie.boxelitestaff.spleef.Session;
+package tiie.boxelitestaff.spleef.session;
 
 import org.bukkit.entity.Player;
 

@@ -1,4 +1,4 @@
-package tiie.boxelitestaff.spleef.Player;
+package tiie.boxelitestaff.spleef.player;
 
 import org.bukkit.configuration.ConfigurationSection;
 

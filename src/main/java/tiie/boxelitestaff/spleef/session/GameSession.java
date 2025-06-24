@@ -1,4 +1,4 @@
-package tiie.boxelitestaff.spleef.Session;
+package tiie.boxelitestaff.spleef.session;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
@@ -7,10 +7,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import tiie.boxelitestaff.BoxEliteStaff;
-import tiie.boxelitestaff.spleef.Arena.ArenaManager;
-import tiie.boxelitestaff.spleef.Arena.SpleefArena;
-import tiie.boxelitestaff.spleef.Player.StatsManager;
-import tiie.boxelitestaff.spleef.SpleefListener.SpleefGameListener;
+import tiie.boxelitestaff.spleef.arena.ArenaManager;
+import tiie.boxelitestaff.spleef.arena.SpleefArena;
+import tiie.boxelitestaff.spleef.player.StatsManager;
+import tiie.boxelitestaff.spleef.spleefListener.SpleefGameListener;
 import tiie.boxelitestaff.spleef.scoreboard.SpleefScoreboardManager;
 
 import java.util.*;

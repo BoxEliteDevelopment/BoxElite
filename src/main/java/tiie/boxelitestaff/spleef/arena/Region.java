@@ -1,4 +1,4 @@
-package tiie.boxelitestaff.spleef.Arena;
+package tiie.boxelitestaff.spleef.arena;
 
 import org.bukkit.Location;
 
@@ -32,7 +32,7 @@ public class Region {
                 && z >= getMinZ() && z <= getMaxZ();
     }
 
-    // === New utility methods for easy iteration ===
+
     public int getMinX() { return Math.min(pos1.getBlockX(), pos2.getBlockX()); }
     public int getMaxX() { return Math.max(pos1.getBlockX(), pos2.getBlockX()); }
 

@@ -1,4 +1,4 @@
-package tiie.boxelitestaff.spleef.Arena;
+package tiie.boxelitestaff.spleef.arena;
 
 import org.bukkit.Location;
 import org.bukkit.Material;

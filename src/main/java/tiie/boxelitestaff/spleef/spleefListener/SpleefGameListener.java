@@ -1,4 +1,4 @@
-package tiie.boxelitestaff.spleef.SpleefListener;
+package tiie.boxelitestaff.spleef.spleefListener;
 
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -14,10 +14,9 @@ import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import tiie.boxelitestaff.BoxEliteStaff;
-import tiie.boxelitestaff.spleef.Arena.SpleefArena;
-import tiie.boxelitestaff.spleef.Session.GameSession;
+import tiie.boxelitestaff.spleef.arena.SpleefArena;
+import tiie.boxelitestaff.spleef.session.GameSession;
 
-import java.net.http.WebSocket;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;

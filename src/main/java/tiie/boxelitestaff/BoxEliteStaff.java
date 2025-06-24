@@ -14,11 +14,11 @@ import tiie.boxelitestaff.StaffClasses.MessagerManager;
 import tiie.boxelitestaff.StaffClasses.StaffChatCommand;
 import tiie.boxelitestaff.StaffClasses.StaffChatListener;
 import tiie.boxelitestaff.StaffClasses.StaffChatManager;
-import tiie.boxelitestaff.spleef.Arena.ArenaManager;
-import tiie.boxelitestaff.spleef.Player.StatsManager;
-import tiie.boxelitestaff.spleef.Session.ArenaSessionManager;
+import tiie.boxelitestaff.spleef.arena.ArenaManager;
+import tiie.boxelitestaff.spleef.player.StatsManager;
+import tiie.boxelitestaff.spleef.session.ArenaSessionManager;
 import tiie.boxelitestaff.spleef.SpleefCommand;
-import tiie.boxelitestaff.spleef.SpleefListener.SpleefGameListener;
+import tiie.boxelitestaff.spleef.spleefListener.SpleefGameListener;
 import tiie.boxelitestaff.spleef.queue.QueueManager;
 import tiie.boxelitestaff.spleef.scoreboard.SpleefScoreboardManager;
 
