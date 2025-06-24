@@ -15,9 +15,12 @@ import tiie.boxelitestaff.StaffClasses.StaffChatCommand;
 import tiie.boxelitestaff.StaffClasses.StaffChatListener;
 import tiie.boxelitestaff.StaffClasses.StaffChatManager;
 import tiie.boxelitestaff.spleef.Arena.ArenaManager;
+import tiie.boxelitestaff.spleef.Player.StatsManager;
 import tiie.boxelitestaff.spleef.Session.ArenaSessionManager;
 import tiie.boxelitestaff.spleef.SpleefCommand;
 import tiie.boxelitestaff.spleef.SpleefListener.SpleefGameListener;
+import tiie.boxelitestaff.spleef.queue.QueueManager;
+import tiie.boxelitestaff.spleef.scoreboard.SpleefScoreboardManager;
 
 import java.io.File;
 
@@ -32,13 +35,24 @@ public final class BoxEliteStaff extends JavaPlugin {
     private EventManager eventManager;
     private ArenaManager arenaManager;
     private ArenaSessionManager setupSessionArena;
+    private QueueManager queueManager;
 
     private SpleefGameListener spleefGameListener;
+
+    private StatsManager statsManager;
+    private SpleefScoreboardManager scoreboardManager;
 
     @Override
     public void onEnable() {
 
+        //TODO make main and other classes cleaner
+        instance = this;
+
         arenaManager = new ArenaManager();
+        queueManager = new QueueManager(arenaManager);
+        statsManager = new StatsManager();
+        scoreboardManager = new SpleefScoreboardManager();
+
 
         FileConfiguration arenasConfig = YamlConfiguration.loadConfiguration(
                 new File(getDataFolder(), "arenas.yml")
@@ -46,12 +60,15 @@ public final class BoxEliteStaff extends JavaPlugin {
 
 
 
+
         arenaManager.loadArenas(arenasConfig);
+        getStatsManager().loadStats();
         this.setupSessionArena = new ArenaSessionManager();
 
         this.spleefGameListener = new SpleefGameListener();
 
-        instance = this;
+
+
 
 
         saveDefaultConfig();
@@ -72,6 +89,7 @@ public final class BoxEliteStaff extends JavaPlugin {
         staffChatManager.saveToggledPlayers();
         staffChatManager.stopActionBarTask();
         eventManager.restoreAllInventories();
+        statsManager.saveStats();
 
         getLogger().info("BoxEliteStaff disabled.");
     }
@@ -144,5 +162,15 @@ public final class BoxEliteStaff extends JavaPlugin {
 
     public MessagerManager getMessageManager() {
         return messageManager;
+    }
+    public QueueManager getQueueManager() {
+        return queueManager;
+    }
+    public StatsManager getStatsManager() {
+        return statsManager;
+    }
+
+    public SpleefScoreboardManager getScoreboardManager() {
+        return scoreboardManager;
     }
 }

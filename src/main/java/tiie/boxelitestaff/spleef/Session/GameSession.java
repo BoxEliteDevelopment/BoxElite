@@ -9,7 +9,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import tiie.boxelitestaff.BoxEliteStaff;
 import tiie.boxelitestaff.spleef.Arena.ArenaManager;
 import tiie.boxelitestaff.spleef.Arena.SpleefArena;
+import tiie.boxelitestaff.spleef.Player.StatsManager;
 import tiie.boxelitestaff.spleef.SpleefListener.SpleefGameListener;
+import tiie.boxelitestaff.spleef.scoreboard.SpleefScoreboardManager;
 
 import java.util.*;
 
@@ -27,10 +29,48 @@ public class GameSession {
     private int gameLoopTaskId = -1;
     private boolean ended = false;
 
+    private int queueCountdownTaskId = -1;
+
     public GameSession(SpleefArena arena, List<Player> players, ArenaManager manager) {
         this.arena = arena;
         this.players = players;
         this.arenaManager = manager;
+    }
+
+    private int timeLeft = 120; // 2 minutes by default
+
+    public int getTimeLeft() {
+        return timeLeft;
+    }
+
+    public void startQueueCountdown(int seconds) {
+        final int[] timeLeft = {seconds};
+
+        queueCountdownTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(
+                Bukkit.getPluginManager().getPlugin("BoxEliteStaff"),
+                () -> {
+                    if (timeLeft[0] == 0) {
+                        Bukkit.getScheduler().cancelTask(queueCountdownTaskId);
+                        queueCountdownTaskId = -1;
+                        runCountdown(5); // ⬅️ Actually run 5s countdown now (will teleport)
+                        return;
+                    }
+
+                    for (Player player : players) {
+                        if (player.isOnline()) {
+                            player.sendTitle("§eGame starting in", "§c" + timeLeft[0] + "s", 5, 15, 5);
+                            BoxEliteStaff.getInstance().getScoreboardManager()
+                                    .showGameBoard(player, timeLeft[0], players.size());
+                        }
+                    }
+
+                    timeLeft[0]--;
+                }, 0L, 20L
+        );
+    }
+
+    public SpleefArena getArena() {
+        return arena;
     }
 
     public void start() {
@@ -47,23 +87,28 @@ public class GameSession {
 
            BoxEliteStaff.getInstance().getSpleefGameListener().addPlayer(player);
             player.setGameMode(GameMode.SURVIVAL);
+            BoxEliteStaff.getInstance().getScoreboardManager()
+                    .showGameBoard(player, timeLeft, players.size());
             Location spawn = spawns.get(i % spawns.size());
             assignedSpawns.put(player.getUniqueId(), spawn);
             activePlayers.add(player.getUniqueId());
+
         }
 
         runCountdown(5); // 5-second countdown
     }
 
+    private int countdownSecondsLeft = 5;
+
     private void runCountdown(int seconds) {
+        countdownSecondsLeft = seconds;
+
         countdownTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(
                 Bukkit.getPluginManager().getPlugin("BoxEliteStaff"),
                 new Runnable() {
-                    int timeLeft = seconds;
-
                     @Override
                     public void run() {
-                        if (timeLeft == 0) {
+                        if (countdownSecondsLeft == 0) {
                             for (UUID uuid : activePlayers) {
                                 Player player = Bukkit.getPlayer(uuid);
                                 if (player != null) {
@@ -81,14 +126,13 @@ public class GameSession {
                         for (UUID uuid : activePlayers) {
                             Player player = Bukkit.getPlayer(uuid);
                             if (player != null) {
-                                player.sendTitle("§e" + timeLeft, "", 0, 20, 0);
+                                player.sendTitle("§e" + countdownSecondsLeft, "", 0, 20, 0);
                             }
                         }
 
-                        timeLeft--;
+                        countdownSecondsLeft--;
                     }
-                },
-                0L, 20L
+                }, 0L, 20L
         );
     }
 
@@ -96,6 +140,8 @@ public class GameSession {
         gameLoopTaskId = Bukkit.getScheduler().runTaskTimer(
                 Bukkit.getPluginManager().getPlugin("BoxEliteStaff"),
                 () -> {
+                    timeLeft--; // decrease each tick
+
                     Iterator<UUID> iter = activePlayers.iterator();
                     while (iter.hasNext()) {
                         UUID uuid = iter.next();
@@ -108,20 +154,31 @@ public class GameSession {
                             player.getInventory().clear();
                             player.setGameMode(GameMode.SPECTATOR);
                             player.teleport(arena.getSpectatorSpawn());
-
-
-
                         }
                     }
+
+
+                    BoxEliteStaff.getInstance()
+                            .getScoreboardManager()
+                            .updateInGameBoards(activePlayers, timeLeft, activePlayers.size());
 
 
                     if (activePlayers.size() <= 1) {
                         end();
                     }
+
+                    if (timeLeft == 0) {
+
+                        //TODO triggerSuddenDeath(); class to be made
+                    }
                 },
                 20L, 20L
         ).getTaskId();
     }
+
+
+
+
 
     public void end() {
         if (ended) return;
@@ -130,41 +187,66 @@ public class GameSession {
         Bukkit.getScheduler().cancelTask(countdownTaskId);
         Bukkit.getScheduler().cancelTask(gameLoopTaskId);
 
-        // Announce winner or no winner
+        announceWinner();
+
+        // Clear scoreboards for active players & spectators
+        SpleefScoreboardManager scoreboardManager = BoxEliteStaff.getInstance().getScoreboardManager();
+
+        // Clear active players' scoreboard
+        scoreboardManager.clearAll(activePlayers);
+
+        // Clear spectators' scoreboard
+        scoreboardManager.clearAll(BoxEliteStaff.getInstance().getSpleefGameListener().getSpectators());
+
+        Bukkit.getScheduler().runTaskLater(BoxEliteStaff.getInstance(), () -> {
+            cleanupPlayers();
+            cleanupSpectators();
+            arena.restoreOriginalFloor();
+            arena.setState(SpleefArena.ArenaState.IDLE);
+            arenaManager.endGame(arena.getName());
+        }, 20 * 10L);
+    }
+
+        private void announceWinner() {
+        StatsManager stats = BoxEliteStaff.getInstance().getStatsManager();
+
         if (activePlayers.size() == 1) {
             Player winner = Bukkit.getPlayer(activePlayers.iterator().next());
             if (winner != null) {
                 Bukkit.broadcastMessage("§6[Spleef] Winner: §a" + winner.getName());
+                stats.getStats(winner.getUniqueId()).addWin();
             }
-        } else if (activePlayers.isEmpty()) {
+        } else {
             Bukkit.broadcastMessage("§6[Spleef] Everyone eliminated, no winner!");
         }
+    }
 
-        // Wait 10 seconds before cleanup and teleporting out
-        Bukkit.getScheduler().runTaskLater(BoxEliteStaff.getInstance(), () -> {
-            // Teleport out and clean active players
-            for (UUID uuid : activePlayers) {
-                Player player = Bukkit.getPlayer(uuid);
-                if (player != null) {
-                    player.teleport(arena.getLobbySpawn());
-                    player.sendMessage("§eGame over.");
-                    BoxEliteStaff.getInstance().getSpleefGameListener().removePlayer(player);
-                    player.getInventory().clear();
-                    player.setGameMode(GameMode.ADVENTURE);
-                }
+    private void cleanupPlayers() {
+        for (UUID uuid : new HashSet<>(activePlayers)) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) {
+                player.teleport(arena.getLobbySpawn());
+                player.sendMessage("§eGame over.");
+                BoxEliteStaff.getInstance().getSpleefGameListener().removePlayer(player);
+                player.getInventory().clear();
+                player.setGameMode(GameMode.ADVENTURE);
             }
-            activePlayers.clear();
-            assignedSpawns.clear();
+        }
+        activePlayers.clear();
+        assignedSpawns.clear();
+    }
 
-            // Teleport and clean spectators (calls the method you added)
-            endSpectating();
-
-            arena.setState(SpleefArena.ArenaState.RESETTING);
-
-            arena.restoreOriginalFloor();
-            arena.setState(SpleefArena.ArenaState.IDLE);
-            arenaManager.endGame(arena.getName());
-        }, 20 * 10L); // 10 seconds delay
+    private void cleanupSpectators() {
+        SpleefGameListener listener = BoxEliteStaff.getInstance().getSpleefGameListener();
+        for (UUID uuid : new HashSet<>(listener.getSpectators())) {
+            Player spectator = Bukkit.getPlayer(uuid);
+            if (spectator != null) {
+                spectator.teleport(arena.getLobbySpawn());
+                spectator.setGameMode(GameMode.SURVIVAL);
+                spectator.sendMessage("§eGame over. You've been returned to the lobby.");
+            }
+        }
+        listener.clearSpectators();
     }
 
     private ItemStack createEventShovel() {
@@ -190,5 +272,23 @@ public class GameSession {
                 spleefGameListener.removeSpectator(player);
             }
         }
+    }
+
+
+    public void forceEliminate(UUID uuid) {
+        Player player = Bukkit.getPlayer(uuid);
+        if (player != null) {
+            player.sendMessage("§cYou were eliminated for leaving.");
+            activePlayers.remove(uuid);
+            BoxEliteStaff.getInstance().getSpleefGameListener().removePlayer(player);
+            BoxEliteStaff.getInstance().getSpleefGameListener().addSpectator(player);
+            player.setGameMode(GameMode.SPECTATOR);
+            player.teleport(arena.getSpectatorSpawn());
+        }
+    }
+
+
+    public boolean isPlayerActive(UUID uuid) {
+        return activePlayers.contains(uuid);
     }
 }

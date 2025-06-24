@@ -1,6 +1,7 @@
 package tiie.boxelitestaff.spleef;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -8,6 +9,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import tiie.boxelitestaff.BoxEliteStaff;
 import tiie.boxelitestaff.spleef.Arena.SpleefArena;
+import tiie.boxelitestaff.spleef.Player.PlayerStats;
+import tiie.boxelitestaff.spleef.Player.StatsManager;
 import tiie.boxelitestaff.spleef.Session.ArenaSessionManager;
 import tiie.boxelitestaff.spleef.Session.ArenaSetupSession;
 import tiie.boxelitestaff.spleef.Session.GameSession;
@@ -48,7 +51,7 @@ public class SpleefCommand extends PlayerCommand {
 
             if (player.hasPermission("boxelite.spleef.event")) {
                 String name = args[1].toLowerCase();
-                setupManager.startSession(player, name);
+                setupManager.startSetupSession(player, name);
                 player.sendMessage("§aStarted arena setup for: " + name);
             } else {
                 player.sendMessage("§cYou don't have permission to create arenas.");
@@ -56,9 +59,116 @@ public class SpleefCommand extends PlayerCommand {
             return true;
         }
 
+        if (args[0].equalsIgnoreCase("stats")) {
+            Player target = player;
+
+            if (args.length >= 2) {
+                target = Bukkit.getPlayer(args[1]);
+                if (target == null) {
+                    player.sendMessage("§cPlayer not found or not online.");
+                    return true;
+                }
+            }
+
+            PlayerStats stats = plugin.getStatsManager().getStats(target.getUniqueId());
+
+            player.sendMessage("§8§m------------------------------");
+            player.sendMessage("§eSpleef Stats for §a" + target.getName());
+            player.sendMessage("§7• §fGames Played: §b" + stats.getGamesPlayed());
+            player.sendMessage("§7• §fWins: §a" + stats.getWins());
+            player.sendMessage("§7• §fLosses: §c" + stats.getLosses());
+            player.sendMessage("§7• §fBlocks Broken: §6" + stats.getBlocksBroken());
+            player.sendMessage("§8§m------------------------------");
+            return true;
+        }
+
+        if (args.length > 0 && args[0].equalsIgnoreCase("top")) {
+            StatsManager statsManager = BoxEliteStaff.getInstance().getStatsManager();
+
+            // Get top 10 players by wins (adjust to your stat)
+            List<Map.Entry<String, Integer>> topPlayers = statsManager.getTopPlayersByWins(10);
+
+            player.sendMessage("§6§lSpleef Leaderboard - Top 10 Wins");
+            int rank = 1;
+            for (Map.Entry<String, Integer> entry : topPlayers) {
+                player.sendMessage("§e#" + rank + " §a" + entry.getKey() + " §7- §f" + entry.getValue() + " wins");
+                rank++;
+            }
+            return true;
+        }
+
+        if (args.length == 2 && args[0].equalsIgnoreCase("resetstats")) {
+            if (!player.hasPermission("spleef.admin")) {
+                player.sendMessage("§cYou don't have permission to do that.");
+                return true;
+            }
+
+            String targetName = args[1];
+            StatsManager statsManager = BoxEliteStaff.getInstance().getStatsManager();
+
+            if (statsManager.resetPlayerStats(targetName)) {
+                player.sendMessage("§aStats reset for player §e" + targetName);
+            } else {
+                player.sendMessage("§cPlayer §e" + targetName + " §cnot found.");
+            }
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("spectate")) {
+            if (args.length < 2) {
+                player.sendMessage("§cUsage: /spleef spectate <arena>");
+                return true;
+            }
+
+            String arenaName = args[1].toLowerCase();
+            GameSession session = plugin.getSetupManager().getGameSession(arenaName);
+
+            if (session == null) {
+                player.sendMessage("§cThat arena is not running a game.");
+                return true;
+            }
+
+            if (plugin.getSpleefGameListener().isSpectator(player)) {
+                player.sendMessage("§cYou are already spectating.");
+                return true;
+            }
+
+            // Spectate
+            plugin.getSpleefGameListener().addSpectator(player);
+            player.getInventory().clear();
+            player.setGameMode(org.bukkit.GameMode.SPECTATOR);
+            player.teleport(session.getArena().getSpectatorSpawn());
+            player.sendMessage("§bYou are now spectating the game in §e" + arenaName);
+            return true;
+        }
+
         if (args[0].equalsIgnoreCase("join")) {
-            plugin.getArenaManager().joinQueue(player);
-            plugin.getArenaManager().tryStartNextGame();
+            plugin.getQueueManager().addPlayer(player);
+            return true;
+        }
+        if (args[0].equalsIgnoreCase("leave")) {
+            plugin.getQueueManager().removePlayer(player);
+
+            // Then check if they're in an active game
+            GameSession session = plugin.getSetupManager().getSessionByPlayer(player.getUniqueId());
+            if (session != null) {
+                session.forceEliminate(player.getUniqueId());
+                player.teleport(session.getArena().getLobbySpawn());
+                player.sendMessage("§cYou have left the Spleef game.");
+            }
+
+            if (plugin.getSpleefGameListener().isSpectator(player)) {
+                plugin.getSpleefGameListener().removeSpectator(player);
+                if (session != null){
+                    player.teleport(session.getArena().getLobbySpawn());
+                    player.setGameMode(GameMode.SURVIVAL);
+                    player.sendMessage("§eYou have stopped spectating.");
+                    return true;
+                }else {
+                    plugin.getLogger();
+                }
+
+            }
             return true;
         }
 
@@ -100,7 +210,7 @@ public class SpleefCommand extends PlayerCommand {
         }
 
 // Everything below this point requires an active session
-        ArenaSetupSession session = setupManager.getSession(player);
+        ArenaSetupSession session = setupManager.getSetupSession(player);
         if (session == null) {
             player.sendMessage("§cYou're not in an arena setup session. Use /spleef create <name> first.");
             return true;
@@ -153,7 +263,7 @@ public class SpleefCommand extends PlayerCommand {
 
                 try {
                     cfg.save(file);
-                    setupManager.endSession(player);
+                    setupManager.endSetupSession(player);
                     player.sendMessage("§aArena saved and setup complete.");
                 } catch (IOException e) {
                     e.printStackTrace();

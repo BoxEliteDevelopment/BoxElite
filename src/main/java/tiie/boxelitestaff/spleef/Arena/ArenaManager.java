@@ -97,31 +97,6 @@ public class ArenaManager {
                 .collect(Collectors.toList());
     }
 
-    public void joinQueue(Player player) {
-        joinQueue.add(new QueuedPlayer(player));
-        player.sendMessage("§aYou have been added to the Spleef queue.");
-    }
-
-    public void tryStartNextGame() {
-        while (!joinQueue.isEmpty()) {
-            List<SpleefArena> available = getAvailableArenas();
-            if (available.isEmpty()) break;
-
-            SpleefArena arena = available.get(0); // basic choice
-            List<Player> players = dequeuePlayers(2); // minimum players
-
-            if (players.size() < 2) {
-                joinQueue.addAll(players.stream().map(QueuedPlayer::new).toList());
-                break;
-            }
-
-            GameSession session = new GameSession(arena, players, this);
-            runningGames.put(arena.getName().toLowerCase(), session);
-            arena.setState(SpleefArena.ArenaState.IN_GAME);
-            session.start();
-        }
-    }
-
     private List<Player> dequeuePlayers(int count) {
         List<Player> players = new ArrayList<>();
         while (!joinQueue.isEmpty() && players.size() < count) {
@@ -150,4 +125,6 @@ public class ArenaManager {
     public void registerSession(String arenaName, GameSession session) {
         runningGames.put(arenaName.toLowerCase(), session);
     }
+
+
 }
